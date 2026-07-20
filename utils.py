@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.fernet import Fernet
 
+
 def salt():
     salt = secrets.token_bytes(16)
     return(salt)
@@ -23,8 +24,17 @@ def encryption_key(master_password, salt):
     return key
 
 
-def password_encryption(Key ,password):
+def password_encryption(Key , password):
     password = password.encode("utf-8")
     f = Fernet(Key)
     encrypted_token = f.encrypt(password)
     return encrypted_token
+
+
+def Decoding(Key,encrypted_token):
+    f = Fernet(Key)
+    original_password_bytes = f.decrypt(encrypted_token)
+    original_password = original_password_bytes.decode('utf-8')
+    return original_password
+
+
