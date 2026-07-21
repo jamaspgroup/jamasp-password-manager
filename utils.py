@@ -1,6 +1,7 @@
 import secrets
 import base64
 import words
+import character
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -51,5 +52,25 @@ def simple_password():
     return d
 
 
-print(simple_password())
+def hard_password(Count = 20, Mode = True):
+    a = secrets.randbits(1)
+    c = secrets.randbits(1)
+    if a:
+        Count = Count - 1
+    elif c:
+        Count = Count
+    else:
+        Count = Count + 1
+        
+    if Mode:
+        ch = character.character
+    else:
+        ch = character.character_full
+        
+    password = ''
+    for i in range(Count):
+        p = secrets.choice(ch)
+        password +=  p
+    return password
+
 
