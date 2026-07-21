@@ -1,5 +1,6 @@
 import secrets
 import base64
+import words
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -37,4 +38,18 @@ def Decoding(Key,encrypted_token):
     original_password = original_password_bytes.decode('utf-8')
     return original_password
 
+
+def simple_password():
+    a = secrets.choice(words.my_words)
+    b = secrets.randbelow(9999)
+    b = str(b)
+    c = secrets.randbits(1)
+    if c :
+        d = a + b
+    else:
+        d = b + a
+    return d
+
+
+print(simple_password())
 
