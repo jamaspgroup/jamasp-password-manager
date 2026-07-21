@@ -9,12 +9,15 @@ from cryptography.fernet import Fernet
 
 
 def salt():
+    """It produces a random salt."""
     salt = secrets.token_bytes(16)
     return(salt)
     
     
 
 def encryption_key(master_password, salt):
+    """It takes the master password and the salt,
+    and generates an encryption key from them."""
     kdf = PBKDF2HMAC(
     algorithm=hashes.SHA256(),
     length=32,
@@ -27,6 +30,8 @@ def encryption_key(master_password, salt):
 
 
 def password_encryption(Key , password):
+    """It takes the code and encrypts it
+    using the encryption key."""
     password = password.encode("utf-8")
     f = Fernet(Key)
     encrypted_token = f.encrypt(password)
@@ -34,6 +39,8 @@ def password_encryption(Key , password):
 
 
 def Decoding(Key,encrypted_token):
+    """It takes the encrypted data along
+    with the key and decrypts it."""
     f = Fernet(Key)
     original_password_bytes = f.decrypt(encrypted_token)
     original_password = original_password_bytes.decode('utf-8')
@@ -41,6 +48,8 @@ def Decoding(Key,encrypted_token):
 
 
 def simple_password():
+    """It creates a simple password using
+    an English word and a number."""
     a = secrets.choice(words.my_words)
     b = secrets.randbelow(9999)
     b = str(b)
@@ -53,6 +62,8 @@ def simple_password():
 
 
 def hard_password(Count = 20, Mode = True):
+    """Generates strong passwords with 
+    custom characters and custom lengths."""
     a = secrets.randbits(1)
     c = secrets.randbits(1)
     if a:
@@ -74,3 +85,17 @@ def hard_password(Count = 20, Mode = True):
     return password
 
 
+def init_password(Count = 20):
+    """Generates numeric-only
+    codes of a custom length."""
+    password = ''
+    for i in range(Count):
+        p = secrets.randbelow(10)
+        p = str(p)
+        password +=  p
+    return password
+
+
+def TOTP():
+    key = secrets.token_bytes(10)
+    
