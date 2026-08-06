@@ -2,6 +2,10 @@ import secrets
 import base64
 import words
 import character
+import time
+import struct
+import hmac
+import hashlib
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -96,6 +100,24 @@ def init_password(Count = 20):
     return password
 
 
-def TOTP():
-    key = secrets.token_bytes(10)
+def Secret_production():
+    Secret = secrets.token_bytes(10)    #Generating a shared secret
+    Secret_Base32 = base64.b32encode(Secret).decode("ascii")  #Convert secret format to Base32
+    return Secret_Base32
     
+    
+def TOTP(Secret_Base32):
+    time_frame = int(time.time() // 30)     #Taking a time frame     
+    time_bytes = struct.pack(">Q", time_frame)       #Convert time to bytes
+    Secret = base64.b32decode(Secret_Base32)        #Convert secret to bytes
+    pass_hash = hmac.new(key= Secret ,msg=time_bytes, digestmod=hashlib.sha1)       #Generate two-factor authentication as a hash
+    pass_bytes = pass_hash.digest()      #Convert to two-factor authentication bytes    
+    offset = pass_bytes[-1] & 0x0F       #Takes the last byte of the HMAC output and extracts a number between 0 and 15 from it.
+    binary_code = pass_bytes[offset:offset + 4]     
+    code_int = int.from_bytes(binary_code, "big")
+    code_int = code_int & 0x7FFFFFFF
+    otp = code_int % 1_000_000
+    
+    return otp
+    
+
