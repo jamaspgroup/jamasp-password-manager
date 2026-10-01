@@ -7,6 +7,7 @@ import struct
 import hmac
 import hashlib
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.fernet import Fernet
@@ -22,12 +23,12 @@ def salt():
 def encryption_key(master_password, salt):
     """It takes the master password and the salt,
     and generates an encryption key from them."""
-    kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA256(),
-    length=32,
+    kdf = Argon2id(
     salt=salt,
-    iterations=100_000,
-    backend=default_backend()) 
+    length=32,
+    iterations=600,
+    lanes=4,
+    memory_cost=131072,) 
     key_raw = kdf.derive(master_password.encode('utf-8'))
     key = base64.urlsafe_b64encode(key_raw)
     return key
@@ -119,5 +120,14 @@ def TOTP(Secret_Base32):
     otp = code_int % 1_000_000
     
     return otp
-    
 
+
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
