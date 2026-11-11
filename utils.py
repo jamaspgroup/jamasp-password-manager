@@ -121,6 +121,75 @@ def TOTP(Secret_Base32):
     
     return otp
 
+#Database
+def create_database(db_path, master_password)
+    """
+    Create a local encrypted password database.
+    """
+    db_path = Path(db_path)
+
+    if db_path.exists():
+        raise FileExistsError("Database already exists.")
+
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    database_salt = salt()
+    key = encryption_key(master_password, database_salt)
+
+    connection = sqlite3.connect(db_path)
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            CREATE TABLE passwords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                service_name BLOB NOT NULL,
+                domain BLOB NOT NULL,
+                username BLOB NOT NULL,
+                password BLOB NOT NULL,
+                created_at BLOB NOT NULL,
+                updated_at BLOB NOT NULL,
+            )
+        """)
+        cursor.execute("""
+            CREATED TABLE metadata (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                salt BLOB NOT NULL,
+                verifier BLOB NOT NULL,
+                schema_version INTEGER NOT NULL
+            )
+        """)
+        verifier = password_encryption(
+            key,
+            "JAMASP_VAULT_VERIFICATION"
+        )
+
+        cursor.execute("""
+            INSERT INTO metadata (
+                id,
+                salt,
+                verifier,
+                schema_version
+            )
+            VALUES (?,?,?,?)
+        """, (1, database_salt, verifier, 1))
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finnaly:
+        connection.close()
+
+    try:
+        db_path.chmod(0o600)
+    except OSError: 
+        pass
+
+    return key
+        
 
 print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
 print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
