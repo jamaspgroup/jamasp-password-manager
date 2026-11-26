@@ -6,6 +6,11 @@ import time
 import struct
 import hmac
 import hashlib
+import os
+import sqlite3
+import threading
+import pyperclip
+from famous_password import common_passwords as cp
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from cryptography.hazmat.primitives import hashes
@@ -224,7 +229,18 @@ def Password_Strength(master_password = str):
         return Status , character_count , ch_type
 
 
+def coppy_pass(password):
+    pyperclip.copy(f"{password}")
+    time.sleep(600)
+    paste = str(pyperclip.paste())
+    if paste == password:
+        pyperclip.copy("")
+    thread = threading.Thread(target=coppy_pass)
+    thread.start
+    
 
+def coppy_text(text):
+    pyperclip.copy(f"{text}")
 
 
 #Database
