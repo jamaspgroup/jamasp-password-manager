@@ -121,6 +121,112 @@ def TOTP(Secret_Base32):
     
     return otp
 
+def Domain_Detection(Domain = str):
+    
+    #It checks whether the entered domain is valid or not.
+    
+    Point_location = Domain.find(".")
+    two_Points = Domain[Point_location + 1]
+    Domain_len = len(Domain)
+
+    if "https://" in Domain :
+        Domain = Domain.replace("https://", " ")
+        Slash_location = Domain.find("/")
+    elif "http://" in Domain:
+        Domain = Domain.replace("http://", " ")
+        Slash_location = Domain.find("/")
+    else:
+        Slash_location = Domain.find("/")
+        
+    Domain_Slash = len(Domain[:Slash_location])
+
+    if Point_location == -1:
+        Status = False
+        
+    elif 3 > Domain_len:
+        Status = False
+        
+    elif two_Points == ".":
+        Status = False
+        
+    elif Domain_len > 2083:
+        Status = False
+        
+    elif Domain_Slash > 256:
+        Status = False
+        
+    else:
+        Status = True
+
+    return Status
+
+
+def Password_Strength(master_password = str):
+    
+    #This function checks the password strength.
+
+    character_count = len(master_password)
+    
+    ch_type = []
+
+    for item in cp:
+        if item == master_password:
+            Status = 1
+
+
+    if character_count <= 8:
+        Status = 0
+
+    elif character_count <= 10:
+        Status = 1
+
+    elif character_count <= 12:
+        Status = 2
+
+    elif character_count <= 14:
+        Status = 3
+
+    else:
+        Status = 4
+    
+    def chec_character(list):
+        nonlocal Status
+        
+        for item in master_password:
+            found = False
+            for i in list:
+                if item == i:
+                    Status += 1
+                    found = True
+                    break
+                else:
+                    pass
+            if found:
+                break
+        return found
+
+    
+    if chec_character(character.Alphabet):
+        ch_type.append("Alphabet")
+    if chec_character(character.number):
+        ch_type.append("number")
+    if chec_character(character.ASCII):
+        ch_type.append("ASCII")    
+    
+    if Status >= 4:
+        Status = 4
+        Status = str(Status)
+        return Status , character_count , ch_type
+
+    else:
+        Status = str(Status)  
+        
+        return Status , character_count , ch_type
+
+
+
+
+
 #Database
 def create_database(db_path, master_password)
     """
@@ -191,12 +297,4 @@ def create_database(db_path, master_password)
     return key
         
 
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
-print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
+
