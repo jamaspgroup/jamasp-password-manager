@@ -6,6 +6,10 @@ import time
 import struct
 import hmac
 import hashlib
+import sqlite3
+import os
+import subprocess
+from pathlib import Path
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from cryptography.hazmat.primitives import hashes
@@ -120,6 +124,84 @@ def TOTP(Secret_Base32):
     otp = code_int % 1_000_000
     
     return otp
+
+def create_database(db_path):
+    """
+    Creates a local SQlite database for the password manager.
+    """
+
+    db_path = Path(db_path)
+
+    if db_path.exists():
+        raise FileExistsError("Database already exists.")    
+
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    connection = None
+
+    try:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+
+        #Passwords table
+        cursor.execute("""
+            CREATE TABLE passwords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                service_name BLOB NOT NULL,
+                domain BLOB NOT NULL,
+                username BLOB NOT NULL,
+                password BLOB NOT NULL,
+                created_at BLOB NOT NULL,
+                updated_at BLOB NOT NULL
+            )
+        """)
+
+        #Metadata table
+        cursor.execute("""
+            CREATE TABLE metadata (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                salt BLOB NOT NULL,
+                verifier BLOB NOT NULL,
+                schema_version INTEGER NOT NULL
+            )
+        """)
+        connection.commit()
+
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        db_path.unlink(missing_ok=True)
+        raise
+
+    finally:
+        if connection is not None:
+            connection.close()
+    #Restrict database file permissions (Linux/macOS)
+        if os.name == "nt":
+        username = subprocess.run(
+            ["whoami"],
+            capture_output=True,
+            text=True,
+            check=True
+        ).stdout.strip()
+
+        subprocess.run(
+            [
+                "icacls",
+                str(db_path),
+                "/inheritance:r",
+                "/grant:r",
+                f"{username}:(F)"
+            ],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+    elif os.name == "posix":
+        db_path.chmod(0o600)
+
+    return db_path
 
 
 print(encryption_key("123354565676788904" ,b'\x8d\x7f\x80\xd4\xe0\xa2\xcbTsN\xae\xc37\x04//'))
