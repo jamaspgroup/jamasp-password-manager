@@ -10,6 +10,9 @@ import os
 import sqlite3
 import threading
 import pyperclip
+import getpass
+import sys
+import msvcrt
 from famous_password import common_passwords as cp
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
@@ -241,6 +244,22 @@ def coppy_pass(password):
 
 def coppy_text(text):
     pyperclip.copy(f"{text}")
+
+def show_password(password = str):
+    password = len(password)
+    print(password*"*")
+    
+def input_password():
+    password = ""
+    while True:
+        x = msvcrt.getch()
+        if x == b'\r':
+            break
+        sys.stdout.write('*')
+        sys.stdout.flush()
+        password +=x.decode()
+
+    return password
 
 
 #Database
